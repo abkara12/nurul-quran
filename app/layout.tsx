@@ -3,11 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Hifdh Journal",
-    template: "%s | Hifdh Journal",
+    default: "The Hifdh Journal",
+    template: "%s | The Hifdh Journal",
   },
-  description: "Hifdh Journal",
-  applicationName: "Hifdh Journal",
+  description: "The Hifdh Journal",
+  applicationName: "The Hifdh Journal",
   manifest: "/manifest.webmanifest",
 
   icons: {
