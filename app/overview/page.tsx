@@ -327,6 +327,9 @@ export default function OverviewPage() {
   )}
 
                         <tr key={r.id} className="text-sm hover:bg-black/[0.02] transition-colors">
+                        <td className="py-4 pr-4 pl-2 font-medium text-gray-600">
+  {getDayName(r.dateKey)}
+</td>
                           <td className="py-4 pr-4 pl-2 font-medium text-gray-900">
                             {r.dateKey ?? r.id}
                           </td>
