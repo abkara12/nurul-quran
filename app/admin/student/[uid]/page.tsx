@@ -381,25 +381,25 @@ const [studentName, setStudentName] = useState("");
           weeklyGoalCompletedDateKey: nextCompletedKey || null,
           weeklyGoalDurationDays: nextDuration ?? null,
 
-          currentSabak: sabak,
-          currentSabakDhor: sabakDhor,
-          currentDhor: dhor,
+          // currentSabak: sabak,
+          // currentSabakDhor: sabakDhor,
+          // currentDhor: dhor,
 
           // ✅ Save snapshot in BOTH naming styles too
-          currentSabakRead: sabakReadQuality,
-          currentSabakDhorRead: sabakDhorReadQuality,
-          currentDhorRead: dhorReadQuality,
+          // currentSabakRead: sabakReadQuality,
+          // currentSabakDhorRead: sabakDhorReadQuality,
+          // currentDhorRead: dhorReadQuality,
 
-          currentSabakReadQuality: sabakReadQuality,
-          currentSabakDhorReadQuality: sabakDhorReadQuality,
-          currentDhorReadQuality: dhorReadQuality,
+          // currentSabakReadQuality: sabakReadQuality,
+          // currentSabakDhorReadQuality: sabakDhorReadQuality,
+          // currentDhorReadQuality: dhorReadQuality,
 
-          currentSabakReadNotes: sabakReadNotes,
-          currentSabakDhorReadNotes: sabakDhorReadNotes,
-          currentDhorReadNotes: dhorReadNotes,
+          // currentSabakReadNotes: sabakReadNotes,
+          // currentSabakDhorReadNotes: sabakDhorReadNotes,
+          // currentDhorReadNotes: dhorReadNotes,
 
-          currentSabakDhorMistakes: sabakDhorMistakes,
-          currentDhorMistakes: dhorMistakes,
+          // currentSabakDhorMistakes: sabakDhorMistakes,
+          // currentDhorMistakes: dhorMistakes,
 
           updatedAt: serverTimestamp(),
           lastUpdatedBy: me?.uid ?? null,
@@ -416,6 +416,9 @@ const [studentName, setStudentName] = useState("");
 
       setMsg("Saved ✅");
 setTimeout(() => setMsg(null), 2500);
+
+resetFields();
+setMarkGoalCompleted(false);
 
 resetFields();
     } catch (err: any) {
