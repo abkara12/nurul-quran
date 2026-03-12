@@ -248,9 +248,14 @@ const [studentName, setStudentName] = useState("");
       if (sDoc.exists()) {
         const data = sDoc.data() as any;
 
-setStudentName(
-  toText(data.username) || toText(data.email) || "Student"
-);
+const name =
+  typeof data.username === "string"
+    ? data.username
+    : typeof data.email === "string"
+    ? data.email
+    : "Student";
+
+setStudentName(name);
         setWeeklyGoal(toText(data.weeklyGoal));
         setWeeklyGoalWeekKey(toText(data.weeklyGoalWeekKey));
         setWeeklyGoalStartDateKey(toText(data.weeklyGoalStartDateKey));
