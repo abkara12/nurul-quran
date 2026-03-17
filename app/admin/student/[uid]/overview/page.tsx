@@ -183,13 +183,21 @@ const currentMonth = getMonthLabel(new Date().toISOString().slice(0, 10));
 const currentMonthAbsents = absentsByMonth[currentMonth] || 0;
 
   const summary = useMemo(() => {
-    if (!rows.length) return { totalDays: 0, avgSabak: 0, lastGoal: 0 };
-    const sabakNums = rows.map((r) => num(r.sabak)).filter((n) => n > 0);
-    const avgSabak =
-      sabakNums.length ? sabakNums.reduce((a, b) => a + b, 0) / sabakNums.length : 0;
-    const lastGoal = num(rows[0]?.weeklyGoal);
-    return { totalDays: rows.length, avgSabak, lastGoal };
-  }, [rows]);
+  if (!rows.length) return { totalDays: 0, avgSabakLines: 0, avgPresentLines: 0, lastGoal: 0 };
+
+  // Total lines including all days (0 sabak counts)
+  const totalLines = rows.reduce((sum, r) => sum + num(r.sabak) * 13, 0);
+  const avgSabakLines = totalLines / rows.length;
+
+  // Only present days
+  const presentRows = rows.filter((r) => r.attendance === "present");
+  const totalPresentLines = presentRows.reduce((sum, r) => sum + num(r.sabak) * 13, 0);
+  const avgPresentLines = presentRows.length ? totalPresentLines / presentRows.length : 0;
+
+  const lastGoal = num(rows[0]?.weeklyGoal);
+
+  return { totalDays: rows.length, avgSabakLines, avgPresentLines, lastGoal };
+}, [rows]);
 
   if (checking) {
     return (
@@ -302,8 +310,14 @@ const currentMonthAbsents = absentsByMonth[currentMonth] || 0;
             label="Absences (this month)"
             value={String(currentMonthAbsents)}
           />
-          <StatCard label="Average Sabak" value={summary.avgSabak ? summary.avgSabak.toFixed(1) : "—"} />
-          <StatCard label="Latest weekly goal" value={summary.lastGoal ? String(summary.lastGoal) : "—"} />
+<StatCard
+  label="Average Sabak"
+  value={
+    summary.avgSabakLines
+      ? `${summary.avgSabakLines.toFixed(1)} lines/day (${summary.avgPresentLines.toFixed(1)} on present days)`
+      : "—"
+  }
+/>          <StatCard label="Latest weekly goal" value={summary.lastGoal ? String(summary.lastGoal) : "—"} />
         </div>
 
                 <div className="mb-6 flex flex-wrap gap-3">
