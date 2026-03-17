@@ -314,7 +314,7 @@ const currentMonthAbsents = absentsByMonth[currentMonth] || 0;
   label="Average Sabak"
   value={
     summary.avgSabakLines
-      ? `${summary.avgSabakLines.toFixed(1)} lines/day (${summary.avgPresentLines.toFixed(1)} on present days)`
+      ? `${summary.avgSabakLines.toFixed(1)} lines/day`
       : "—"
   }
 />          <StatCard label="Latest weekly goal" value={summary.lastGoal ? String(summary.lastGoal) : "—"} />
