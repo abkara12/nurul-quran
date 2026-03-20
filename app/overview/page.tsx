@@ -344,7 +344,12 @@ export default function OverviewPage() {
 
                       const duration = storedDur ?? calcDur;
 
-                      const completed = Boolean(completedKey) || (duration ?? 0) > 0;
+                      const notReached =
+  startKey &&
+  !completedKey &&
+  diffDaysInclusive(startKey, r.dateKey || "") > 7;
+
+const completed = Boolean(completedKey);
 
                       return (
                         <>
@@ -417,25 +422,35 @@ export default function OverviewPage() {
                           </td>
 
                           <td className="py-4 px-4 border-l border-gray-100">
-                            {g > 0 ? (
-                              <span
-                                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold border ${
-                                  completed
-                                    ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                                    : "border-amber-200 bg-amber-50 text-amber-700"
-                                }`}
-                              >
-                                <span
-                                  className={`h-2 w-2 rounded-full ${
-                                    completed ? "bg-emerald-500" : "bg-amber-500"
-                                  }`}
-                                />
-                                {completed ? "Completed" : "In progress"}
-                              </span>
-                            ) : (
-                              <span className="text-xs text-gray-500">No goal set</span>
-                            )}
-                          </td>
+                                    {g > 0 ? (
+                                      <span
+                                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold border ${
+                                          completed
+                                            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                                            : notReached
+                                            ? "border-red-200 bg-red-50 text-red-700"
+                                            : "border-amber-200 bg-amber-50 text-amber-700"
+                                        }`}
+                                      >
+                                        <span
+                                          className={`h-2 w-2 rounded-full ${
+                                            completed
+                                              ? "bg-emerald-500"
+                                              : notReached
+                                              ? "bg-red-500"
+                                              : "bg-amber-500"
+                                          }`}
+                                        />
+                                        {completed
+                                          ? "Completed"
+                                          : notReached
+                                          ? "Not reached"
+                                          : "In progress"}
+                                      </span>
+                                    ) : (
+                                      <span className="text-xs text-gray-500">No goal set</span>
+                                    )}
+                                  </td>
 
                           <td className="py-4 px-4 text-gray-800 border-l border-gray-100">
                             {duration ? `${duration} day(s)` : "—"}
