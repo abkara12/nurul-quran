@@ -247,6 +247,12 @@ const currentMonthAbsents = absentsByMonth[currentMonth] || 0;
       <section className="max-w-6xl mx-auto px-6 sm:px-10 pb-16">
         <div className="grid sm:grid-cols-4 gap-4 mb-8">
           <StatCard label="Days logged" value={String(summary.totalDays)} />
+
+          <StatCard
+            label="Absences (this month)"
+            value={String(currentMonthAbsents)}
+          />
+          
           <StatCard
             label="Average Sabak"
             value={
@@ -255,10 +261,7 @@ const currentMonthAbsents = absentsByMonth[currentMonth] || 0;
                 : "—"
             }
             />
-                      <StatCard
-            label="Absences (this month)"
-            value={String(currentMonthAbsents)}
-          />
+                      
             
           <StatCard
             label="Latest weekly goal"
