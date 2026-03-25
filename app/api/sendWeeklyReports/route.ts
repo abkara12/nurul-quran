@@ -51,10 +51,10 @@ export async function GET() {
 
       let reportText = `السلام عليكم ورحمة الله وبركاته
 
-📖 *Weekly Hifdh Report*
-👤 *Student*: ${userData.username}
-👨‍🏫 *Ustad*: Moulana Shaheed Bhabha
-🗓️ *Month*: ${monthLabel}
+*Weekly Hifdh Report*
+*Student:* ${userData.username}
+*Ustad:* Moulana Shaheed Bhabha
+*Month:* ${monthLabel}
 
 `;
 
@@ -62,40 +62,36 @@ export async function GET() {
         recentLogs.forEach((logDoc, index) => {
           const logData = logDoc.data();
           const dateObj = logData.createdAt?.toDate ? logData.createdAt.toDate() : new Date();
-
           const dayName = dateObj.toLocaleDateString("en-US", { weekday: "short" });
           const dateFormatted = dateObj.toLocaleDateString("en-US", { day: "numeric", month: "short" });
 
           reportText += `*${dayName} ${dateFormatted}*\n\n`;
 
           // Sabak
-          reportText += `*Sabak*: ${logData.sabak ?? "-"} | ${logData.sabakReadQuality ?? "-"}\n`;
-          if (logData.sabakReadNotes) reportText += `📝 Note: ${logData.sabakReadNotes}\n\n`;
+          reportText += `*Sabak:* ${logData.sabak ?? "-"} | ${logData.sabakReadQuality ?? "-"}\n`;
+          if (logData.sabakReadNotes) reportText += `Note: ${logData.sabakReadNotes}\n\n`;
 
           // Sabak Dhor
-          reportText += `*Sabak Dhor*: ${logData.sabakDhor ?? "-"} | ${logData.sabakDhorReadQuality ?? "-"}\n`;
-          if (logData.sabakDhorReadNotes) reportText += `📝 Note: ${logData.sabakDhorReadNotes}\n\n`;
+          reportText += `*Sabak Dhor:* ${logData.sabakDhor ?? "-"} | ${logData.sabakDhorReadQuality ?? "-"}\n`;
+          if (logData.sabakDhorReadNotes) reportText += `Note: ${logData.sabakDhorReadNotes}\n\n`;
 
           // Dhor
-          reportText += `*Dhor*: ${logData.dhor ?? "-"} | ${logData.dhorReadQuality ?? "-"}\n`;
-          if (logData.dhorReadNotes) reportText += `📝 Note: ${logData.dhorReadNotes}\n\n`;
+          reportText += `*Dhor:* ${logData.dhor ?? "-"} | ${logData.dhorReadQuality ?? "-"}\n`;
+          if (logData.dhorReadNotes) reportText += `Note: ${logData.dhorReadNotes}\n\n`;
 
-          // Mistakes
-          reportText += `❌ *Mistakes*: Sabak Dhor ${logData.sabakDhorMistakes ?? "0"} | Dhor ${logData.dhorMistakes ?? "0"}\n`;
-
-          if (index !== recentLogs.length - 1) reportText += `────────────────\n\n`;
+          if (index !== recentLogs.length - 1) reportText += `──────────────\n\n`;
         });
 
         const latestLog = recentLogs[0].data();
-        const goalStatus = latestLog.weeklyGoalCompleted ? "✅ Completed" : "⏳ In Progress";
+        const goalStatus = latestLog.weeklyGoalCompleted ? "Completed" : "In Progress";
 
-        reportText += `\n🎯 *Weekly Goal*: ${latestLog.weeklyGoal ?? "-"}\n`;
-        reportText += `📊 *Goal Status*: ${goalStatus}\n`;
-        reportText += `⏱️ Duration: ${latestLog.weeklyGoalDurationDays ?? "-"} days\n\n`;
+        reportText += `*Weekly Goal:* ${latestLog.weeklyGoal ?? "-"}\n`;
+        reportText += `*Goal Status:* ${goalStatus}\n`;
+        reportText += `Duration: ${latestLog.weeklyGoalDurationDays ?? "-"} days\n\n`;
 
-        reportText += `────────────────\n\n*Powered by The Hifdh Journal*`;
+        reportText += `────────────────\n*Powered by The Hifdh Journal*`;
       } else {
-        reportText += `No logs recorded for the last 7 days.\n\n────────────────\n\n*Powered by The Hifdh Journal*`;
+        reportText += `No logs recorded for the last 7 days.\n\n────────────────\n*Powered by The Hifdh Journal*`;
       }
 
       reports.push({
@@ -105,13 +101,14 @@ export async function GET() {
       });
     }
 
-    // Send back HTML so you can copy reports easily
-    let html = `<html><head><meta charset="UTF-8"><title>Weekly Hifdh Reports</title></head><body>`;
+    // HTML for browser with Copy button
+    let html = `<html><head><meta charset="UTF-8"><title>Weekly Hifdh Reports</title></head><body style="font-family:sans-serif;">`;
     reports.forEach((r) => {
-      html += `<div style="border:1px solid #ccc;padding:15px;margin:15px;border-radius:10px;">
-        <h2 style="font-family:sans-serif;">${r.student}</h2>
+      html += `<div style="border:1px solid #e0e0e0;padding:20px;margin:20px;border-radius:8px;background:#f9f9f9;">
+        <h2 style="margin-bottom:10px;">${r.student}</h2>
         <pre style="white-space:pre-wrap;font-family:monospace;">${r.report}</pre>
-        <button onclick="navigator.clipboard.writeText(\`${r.report.replace(/`/g, '\\`')}\`)">Copy to Clipboard</button>
+        <button style="margin-top:10px;padding:8px 12px;border:none;background:#4CAF50;color:white;border-radius:5px;cursor:pointer;"
+        onclick="navigator.clipboard.writeText(\`${r.report.replace(/`/g, '\\`')}\`)">Copy to Clipboard</button>
       </div>`;
     });
     html += `</body></html>`;
