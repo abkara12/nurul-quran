@@ -60,6 +60,22 @@ function getMonthLabel(dateKey?: string) {
   return Math.max(0, days) + 1; // inclusive
 }
 
+/* ---------------- sabak normalization ---------------- */
+function sabakToLines(v: unknown) {
+  const s = toText(v).toLowerCase().trim();
+  if (!s) return 0;
+
+  // If user wrote "page" or "p"
+  if (s.includes("page") || s.includes("p")) {
+    const n = parseFloat(s);
+    return isNaN(n) ? 0 : n * 13; // convert page → 13 lines
+  }
+
+  // Otherwise assume it's lines
+  const n = parseFloat(s.replace(",", "."));
+  return isNaN(n) ? 0 : n;
+}
+
 type LogRow = {
   id: string;
   dateKey?: string;
@@ -187,12 +203,13 @@ const currentMonthAbsents = absentsByMonth[currentMonth] || 0;
   if (!rows.length) return { totalDays: 0, avgSabakLines: 0, avgPresentLines: 0, lastGoal: 0 };
 
   // Total lines including all days (0 sabak counts)
-  const totalLines = rows.reduce((sum, r) => sum + num(r.sabak) * 13, 0);
+  const totalLines = rows.reduce((sum, r) => sum + sabakToLines(r.sabak), 0);
+
   const avgSabakLines = totalLines / rows.length;
 
   // Only present days
   const presentRows = rows.filter((r) => r.attendance === "present");
-  const totalPresentLines = presentRows.reduce((sum, r) => sum + num(r.sabak) * 13, 0);
+ const totalPresentLines = presentRows.reduce((sum, r) => sum + sabakToLines(r.sabak), 0);
   const avgPresentLines = presentRows.length ? totalPresentLines / presentRows.length : 0;
 
   const lastGoal = num(rows[0]?.weeklyGoal);
