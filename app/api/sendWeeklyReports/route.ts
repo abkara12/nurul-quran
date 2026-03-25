@@ -1,5 +1,4 @@
 import admin from "firebase-admin";
-import Twilio from "twilio";
 
 const projectId = process.env.FIREBASE_PROJECT_ID;
 const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
@@ -17,15 +16,10 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-const twilioClient = Twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
-
 export async function GET() {
   try {
     const usersSnapshot = await db.collection("users").get();
-    const reports: any[] = [];
+    const reports: { student: string; report: string }[] = [];
 
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -49,17 +43,10 @@ export async function GET() {
       });
 
       let monthLabel = "";
-
       if (recentLogs.length > 0) {
         const firstLog = recentLogs[0].data();
-        const d = firstLog.createdAt?.toDate
-          ? firstLog.createdAt.toDate()
-          : new Date();
-
-        monthLabel = d.toLocaleDateString("en-US", {
-          month: "long",
-          year: "numeric",
-        });
+        const d = firstLog.createdAt?.toDate ? firstLog.createdAt.toDate() : new Date();
+        monthLabel = d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
       }
 
       let reportText = `السلام عليكم ورحمة الله وبركاته
@@ -74,104 +61,85 @@ Month: ${monthLabel}
       if (recentLogs.length > 0) {
         recentLogs.forEach((logDoc, index) => {
           const logData = logDoc.data();
-
-          const dateObj = logData.createdAt?.toDate
-            ? logData.createdAt.toDate()
-            : new Date();
-
-          const dayName = dateObj.toLocaleDateString("en-US", {
-            weekday: "short",
-          });
-
-          const dateFormatted = dateObj.toLocaleDateString("en-US", {
-            day: "numeric",
-            month: "short",
-          });
+          const dateObj = logData.createdAt?.toDate ? logData.createdAt.toDate() : new Date();
+          const dayName = dateObj.toLocaleDateString("en-US", { weekday: "short" });
+          const dateFormatted = dateObj.toLocaleDateString("en-US", { day: "numeric", month: "short" });
 
           reportText += `${dayName} ${dateFormatted}
 
-Sabak: ${logData.sabak ?? "-"} | ${logData.sabakReadQuality ?? "-"}`;
+Sabak: ${logData.sabak ?? "-"} | ${logData.sabakReadQuality ?? "-"}${logData.sabakReadNotes ? "\nNote: " + logData.sabakReadNotes : ""}
 
-          if (logData.sabakReadNotes) {
-            reportText += `\nNote: ${logData.sabakReadNotes}`;
-          }
+Sabak Dhor: ${logData.sabakDhor ?? "-"} | ${logData.sabakDhorReadQuality ?? "-"}${logData.sabakDhorReadNotes ? "\nNote: " + logData.sabakDhorReadNotes : ""}
 
-          reportText += `
+Dhor: ${logData.dhor ?? "-"} | ${logData.dhorReadQuality ?? "-"}${logData.dhorReadNotes ? "\nNote: " + logData.dhorReadNotes : ""}
 
-Sabak Dhor: ${logData.sabakDhor ?? "-"} | ${
-            logData.sabakDhorReadQuality ?? "-"
-          }`;
+Mistakes: Sabak Dhor ${logData.sabakDhorMistakes ?? "0"} | Dhor ${logData.dhorMistakes ?? "0"}
 
-          if (logData.sabakDhorReadNotes) {
-            reportText += `\nNote: ${logData.sabakDhorReadNotes}`;
-          }
-
-          reportText += `
-
-Dhor: ${logData.dhor ?? "-"} | ${logData.dhorReadQuality ?? "-"}`;
-
-          if (logData.dhorReadNotes) {
-            reportText += `\nNote: ${logData.dhorReadNotes}`;
-          }
-
-          reportText += `
-
-Mistakes: Sabak Dhor ${logData.sabakDhorMistakes ?? "0"} | Dhor ${
-            logData.dhorMistakes ?? "0"
-          }
-
+${index !== recentLogs.length - 1 ? "──────────\n\n" : ""}
 `;
-
-          if (index !== recentLogs.length - 1) {
-            reportText += `──────────\n\n`;
-          }
         });
 
         const latestLog = recentLogs[0].data();
-
-        const goalStatus = latestLog.weeklyGoalCompleted
-          ? "Completed"
-          : "In Progress";
+        const goalStatus = latestLog.weeklyGoalCompleted ? "Completed" : "In Progress";
 
         reportText += `🎯 Weekly Goal: ${latestLog.weeklyGoal ?? "-"}
 📊 Goal Status: ${goalStatus}
 Duration: ${latestLog.weeklyGoalDurationDays ?? "-"}
 
 ────────────────
-
 Powered by The Hifdh Journal`;
       } else {
         reportText += `No logs recorded for the last 7 days.
 
 ────────────────
-
 Powered by The Hifdh Journal`;
       }
 
-      reports.push({
-        student: userData.username,
-        parentPhone: userData.parentPhone,
-        report: reportText.trim(),
-      });
-
-      // if (userData.parentPhone) {
-      //   await twilioClient.messages.create({
-      //     from: `whatsapp:${process.env.TWILIO_WHATSAPP_FROM}`,
-      //     to: `whatsapp:${userData.parentPhone}`,
-      //     body: reportText.trim(),
-      //   });
-      // }
+      reports.push({ student: userData.username, report: reportText });
     }
 
-    return new Response(JSON.stringify({ reports, sent: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    // HTML with copy buttons
+    const html = `
+<html>
+<head>
+<title>Weekly Hifdh Reports</title>
+<style>
+body { font-family: monospace; background: #f9f9f9; padding: 20px; }
+.report-box { background: #fff; border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+button { margin-top: 10px; padding: 5px 10px; cursor: pointer; }
+</style>
+</head>
+<body>
+<h1>Weekly Hifdh Reports</h1>
+${reports
+  .map(
+    (r, idx) => `
+<div class="report-box">
+<h2>${r.student}</h2>
+<pre id="report-${idx}">${r.report}</pre>
+<button onclick="copyReport(${idx})">Copy to Clipboard</button>
+</div>`
+  )
+  .join("")}
+
+<script>
+function copyReport(idx) {
+  const text = document.getElementById('report-' + idx).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Report copied for student #' + (idx + 1));
+  });
+}
+</script>
+</body>
+</html>
+`;
+
+    return new Response(html, { status: 200, headers: { "Content-Type": "text/html" } });
   } catch (err) {
     console.error(err);
-    return new Response(JSON.stringify({ error: "Server error" }), {
+    return new Response(`<html><body>Server error</body></html>`, {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "text/html" },
     });
   }
 }
