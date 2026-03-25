@@ -217,7 +217,8 @@ const [studentName, setStudentName] = useState("");
   const currentWeekKey = useMemo(() => isoWeekKeyFromDateKey(dateKey), [dateKey]);
 
   // weekly goal can be set only once per week
- const goalLocked = !!weeklyGoalCompletedDateKey;
+const goalLocked =
+  !markGoalCompleted && !!weeklyGoalCompletedDateKey;
 
   const goalAlreadyCompleted =
     Boolean(weeklyGoalCompletedDateKey) || (weeklyGoalDurationDays ?? 0) > 0;
@@ -714,7 +715,7 @@ if (nextGoal && weeklyGoalCompletedDateKey && !markGoalCompleted) {
 
                 <input
                   type="checkbox"
-                  checked={goalAlreadyCompleted ? true : markGoalCompleted}
+                  checked={markGoalCompleted || goalAlreadyCompleted}
                   disabled={goalAlreadyCompleted || !weeklyGoal.trim()}
                   onChange={(e) => setMarkGoalCompleted(e.target.checked)}
                   className="h-6 w-6 accent-black disabled:opacity-50"
