@@ -4,13 +4,14 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCLkAWVGoWwmqkWe68Csfth3e1d5M-Kg7o",
-  authDomain: "main-thehifdhjournal-fa34a.firebaseapp.com",
-  projectId: "main-thehifdhjournal-fa34a",
-  storageBucket: "main-thehifdhjournal-fa34a.firebasestorage.app",
-  messagingSenderId: "532135430249",
-  appId: "1:532135430249:web:b7f8f632744883c52d7af8"
+  apiKey: "AIzaSyC_ACQqLNoY2tpTa2X4uMfzi1xgSMRV1Ww",
+  authDomain: "nurul-quran-cdc54.firebaseapp.com",
+  projectId: "nurul-quran-cdc54",
+  storageBucket: "nurul-quran-cdc54.firebasestorage.app",
+  messagingSenderId: "726528013206",
+  appId: "1:726528013206:web:108c5a6ac0fe236bb023b7"
 };
+
 
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
